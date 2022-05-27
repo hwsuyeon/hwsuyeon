@@ -7,11 +7,6 @@ import networkx as nx
 import json
 from shapely.geometry import Point, mapping, Polygon, LineString, MultiLineString, asShape, asMultiPolygon, LinearRing
 import folium
-from tqdm import tqdm
-from pyproj import Proj, transform, Geod
-from operator import itemgetter
-from itertools import groupby
-from tabulate import tabulate
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -38,20 +33,15 @@ mtype = "ISOLA"
 sep = '_'
 baseJSON = mtype+sep+dateandtime+sep+dtype+sep
 
-rL = filedir + 'Common/road/' + 'NGII_CDM_도로중심선_simple_' + sidoCode + '.shp' ## 시군구별 도로 자료(지오앤 요청 자료), EPSG 5179
-bL = filedir + 'isolate/bridge/' + 'NGII_CDM_교량_' + sidoCode + '.shp' ## 시군구별 교량 자료(자체제작), EPSG 5179
-
-print("[2] 전국 도로네트워크, 교량 정보 Load")
-
+rL = filedir + 'Common/road/' + 'NGII_CDM_도로중심선_simple_' + sidoCode + '.shp' 
+bL = filedir + 'isolate/bridge/' + 'NGII_CDM_교량_' + sidoCode + '.shp'
 
 roadLayer = gpd.read_file(rL)
 bridge = gpd.read_file(bL)
 
-## 멀티파트를 싱글파트로
 def multi2sing(link_dataframe):
     link_dataframe = link_dataframe.drop(list(link_dataframe.columns)[:-1], axis=1)
     
-    # multi 라인 찾기
     link_geotypeL = link_dataframe.geom_type
 
     multi_index = []
@@ -73,7 +63,6 @@ def multi2sing(link_dataframe):
 link_dataframe = multi2sing(roadLayer)
 bridge = multi2sing(bridge)
 
-# gdf to nx
 def gdf_to_nx(
     gdf_network,
     approach="primal",
@@ -185,16 +174,16 @@ def _generate_dual(G, gdf_network, fields, angles, multigraph, angle):
 roadnetwork = gdf_to_nx(link_dataframe)
 roadnetwork = roadnetwork.to_undirected()
 
-# 전체 네트워크의 모든 점
+
 rawPoint = []
 gp_edgelist = list(roadnetwork.edges())
-for i in tqdm(range(len(gp_edgelist))):        
+for i in range(len(gp_edgelist)):        
     for j in range(2):
         rawPoint.append(gp_edgelist[i][j])
 
 # dangle 찾기
 dangle = []
-for k in tqdm(range(len(rawPoint))):
+for k in range(len(rawPoint)):
     rP_kth = rawPoint[k]
     first_idx = rawPoint.index(rP_kth)
     try:
@@ -208,9 +197,9 @@ def dist(a, b):
     (x2, y2) = b
     return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
 
-# 0.1m 이내로 끊어진 도로 찾기
+
 need2link = []
-for dangdang2 in tqdm(dangle):
+for dangdang2 in dangle:
     for rawP in rawPoint:
         # distance b/w a and b
         d = dist(dangdang2, rawP)
@@ -220,16 +209,16 @@ for dangdang2 in tqdm(dangle):
             need2link.append((dangdang2, rawP))
             break
 
-# 끊어진 도로 잇기
+
 roadnetwork.add_edges_from(need2link)
 
-# sub graph 제작
+
 sub_graphs = (roadnetwork.subgraph(c).copy() for c in nx.connected_components(roadnetwork))
 sub_graphs = list(sub_graphs)
 
-# 고립지 탐색
-for point in tqdm(range(len(bridge))):
-    # 교량 포함하는 sub graph 탐색
+
+for point in range(len(bridge)):
+
     bridge_point = bridge['geometry'][point].coords
     roadnetwork2 = [[np.nan]]
     for sub_G_ith in sub_graphs:
@@ -237,37 +226,37 @@ for point in tqdm(range(len(bridge))):
             roadnetwork2 = sub_G_ith.copy()
             break
 
-    try: # 서브네트워크 없을 시 패스
+    try: 
         if np.isnan(roadnetwork2)[0][0]:
             continue
-    except: # 서브네트워크가 라인 한 개의 섬일 때 패스
+    except: 
         if roadnetwork2.number_of_nodes() <= 1:
             continue
         
-    # 네트워크에 교량 밖에 없을 시 패스
+
     if roadnetwork2.number_of_edges() <= 1:
         continue
         
-    # 교량 제거
+
     try:
         roadnetwork2.remove_edge(bridge_point[0],
                                  bridge_point[-1])
     except:
-        # 교량의 mid point 제거
+
         roadnetwork2.remove_nodes_from(list(bridge_point)[1:-1])
         
-    # 교량 끝점에서 끝점 갈 수 있으면 pass
+
     if nx.has_path(roadnetwork2, bridge_point[0], bridge_point[-1]):
         continue
 
-    # 교량 제거되어 분리된 sub graphs
+    
     sub_graphs2 = (roadnetwork2.subgraph(c).copy() for c in nx.connected_components(roadnetwork2))
     sub_graphs2_L = list(sub_graphs2)
-    # 서브그래프가 하나 밖에 없으면(=분리 안 됨) 패스
+
     if len(sub_graphs2_L) == 1:
         continue
     
-    # node가 적은 sub graph(고립네트워크)선택 (나중에 아닐 경우도 고민해봐야함)
+
     total_nodes = sum([num_edges.number_of_edges() for num_edges in sub_graphs2_L])
     min_num_nodes = 1e100
     for i in range(len(sub_graphs2_L)):
@@ -281,13 +270,12 @@ for point in tqdm(range(len(bridge))):
     if sub_graphs3.number_of_edges() == 0:
         continue
     
-    # 교량 중 서브그래프와 맞닿아 있지 않은 점
+
     for i in range(-1, 1):
         if bridge_point[i] not in sub_graphs3.nodes():
             out_bridge_Point = Point(bridge_point[i])
                 
-    ## shapefile 만들기   
-    # 고립네트워크 to shp
+
     edgeList = []
     for edge_ith in list(sub_graphs3.edges()):
         edgeList.append(LineString([edge_ith[0], edge_ith[1]]))
@@ -314,24 +302,24 @@ for point in tqdm(range(len(bridge))):
             break
         total_length = len(geo_df)
     
-    # 면적 48km2 이상이면 패스
+
     geo_df['area'] = geo_df.convex_hull.area
     if geo_df['area'].iloc[0] > 48000000:
         continue
     
-    # 면적이 0.64km2 미만이면 0, 이상이면 1
+
     if geo_df['area'].iloc[0] < 640000:
         geo_df['label'] = 0
     else:
         geo_df['label'] = 1
 
-    # 선택된 고립지에 30m buffer 적용
+
     Buffer = geo_df.geometry.buffer(30)
     BUFFER = gpd.GeoDataFrame(geo_df.copy(), geometry = Buffer)
     BUFFER['code'] = 1
     tmp_BUFFER = BUFFER.dissolve(by='code')
         
-    # 좌표계 지정 후 저장
+
     geo_df.crs = {'init' :'epsg:5179'}
     geo_df = geo_df.to_crs(epsg = 4326)
     geo_df.to_file(finpath + 'route_isolated_' + str(point) + '.json', driver='GeoJSON', encoding = 'utf-8')
@@ -350,9 +338,7 @@ for k in os.listdir(finpath)[int(len(os.listdir(finpath))/2+1):int(len(os.listdi
     b.append(json.load(open(finpath + k, encoding = 'utf-8')))
 
 
-print("[4] 시각화")
 
-#### folium module 이용해 시각화
 
 visual_brid = bridge
 

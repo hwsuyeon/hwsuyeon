@@ -1,13 +1,3 @@
-print('[예상고립위험지]')
-print('Python version: 3.6.10')
-print('Library: Networkx, GeoPandas, Pandas, Numpy, Folium')
-
-# ### 0. Dangling Point 선택
-# #### Dangling points는 선의 시작점과 끝점을 의미
-
-print("[1] import module")
-# #### 0.0 import module
-
 import shapefile
 import pandas as pd
 import os
@@ -29,8 +19,7 @@ warnings.filterwarnings("ignore")
 import time
 starttime = time.time()
 
-print('[0] 입력 자료 업로드')
-# 작업 경로
+
 os.chdir('../')
 filedir = './inputData/' # input file path
 finpath = './outputData/isolate/isolate/' # output file path

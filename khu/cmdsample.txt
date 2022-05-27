@@ -1,0 +1,32 @@
+preprocessed : python preprocessed.py HI8_20210221T0528_TYPHN_IMGRGB
+# 전국 단위로 들어오는 피해 shapefile에 대해 각 시군 코드명으로 된 폴더에 각각 저장해주는 코드, parameter는 rawdata 파일명
+
+damageDay : python damageDay.py HI8_20210221T0528_TYPHN_IMGRGB 47930
+# 분석 시군구코드(법정동기준) / 피해 영향 범위 반경
+
+damageNight : python damageNight.py HI8_20210221T0528_TYPHN_IMGRGB 47930
+# 분석 시군구코드(법정동기준) / 피해 영향 범위 반경
+
+evacuationDist : python evacuationDist.py HI8_20210221T0528_TYPHN_IMGRGB 47930
+# 분석 시군구코드(법정동기준)
+
+evacuationCost :  python evacuationCost .py HI8_20210221T0528_TYPHN_IMGRGB 47930
+# 분석 시군구코드(법정동기준)
+
+liveisolate : python liveisolate.py 47930 129.394217 36.814663
+# 분석 시군구코드(법정동기준) / 교량 x 좌표 / 교량 y 좌표
+
+isolate : python isolate.py 47930
+# 분석 시군구코드(법정동기준)
+
+sinkArea : python sinkArea.py 47930 129.396948 36.984181
+# 분석 시군구코드(법정동기준) / 침수 기준점 x좌표 / 침수 기준점 y좌표 / 기준점 반경 / 예상 침수위 1 / 예상 침수위 2 / 예상 침수위 3
+
+reservoir : python reservoir.py 47930
+# 분석 시군구코드(법정동기준)
+
+typhoonInfo : python typhoonInfo.py 2008
+# 분석 대상 태풍 번호
+
+burstiness : python burstiness.py 
+# 

@@ -1,0 +1,13 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "민방위": "울진교육지원청", "capacity": 364, "allo": 360.0, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 129.399480144230381, 36.986375001207279 ] } },
+{ "type": "Feature", "properties": { "민방위": "울진우체국", "capacity": 658, "allo": 658.0, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 129.40335799944063, 36.993838000479158 ] } },
+{ "type": "Feature", "properties": { "민방위": "울진소방서", "capacity": 470, "allo": 75.0, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 129.394576010650098, 36.993413000868522 ] } },
+{ "type": "Feature", "properties": { "민방위": "kt울진지점", "capacity": 954, "allo": 212.0, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 129.402551785448651, 36.995214061195661 ] } },
+{ "type": "Feature", "properties": { "민방위": "한전 울진지점", "capacity": 428, "allo": 140.0, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 129.39524939832657, 36.988934001110309 ] } },
+{ "type": "Feature", "properties": { "민방위": "명지렉스빌", "capacity": 408, "allo": 408.0, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 129.404665781443839, 36.993445000757006 ] } },
+{ "type": "Feature", "properties": { "민방위": "울진읍사무소", "capacity": 558, "allo": 0.0, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 129.402896753962779, 36.997196892740774 ] } }
+]
+}

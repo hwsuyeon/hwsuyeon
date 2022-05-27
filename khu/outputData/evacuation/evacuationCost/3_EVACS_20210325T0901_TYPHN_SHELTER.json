@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "민방위": "수곡리마을회관", "capacity": 133, "allo": 41, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 128.923260200000044, 36.555018710902964 ] } },
+{ "type": "Feature", "properties": { "민방위": "망천2리마을회관", "capacity": 137, "allo": 42, "style": { "color": [ 255, 0, 0, 1 ] } }, "geometry": { "type": "Point", "coordinates": [ 128.882684749924493, 36.558310389150201 ] } }
+]
+}

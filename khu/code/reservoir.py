@@ -132,6 +132,26 @@ P_exRES = exRES.to_crs(wgs)
 P_exRange.to_file(finpath + sidoCode + '/'+ '1_' + baseJSON + 'RANGE.json', driver = 'GeoJSON', encoding = encod)
 P_exRES.to_file(finpath + sidoCode + '/' '2_' + baseJSON + 'RESERVOIR.json', driver = 'GeoJSON', encoding = encod)
 
+
+center = list(reversed(list(P_exRES.unary_union.centroid.coords[0])))  # 침수 구역의 중앙 지점을 기준점으로 인식하는 베이스맵 제작
+testmap = folium.Map(location = center, zoom_start=12)
+
+style1 = {'fillColor': '#0000ff', 'color': '#0000ff','weight':0.5,'fillOpacity':0.8}
+style2 = {'fillColor': '#cfe2f3', 'color': '#cfe2f3','weight':0.5,'fillOpacity':0.6}
+style3 = {'fillColor': '#ff9900', 'color': '#ff9900','weight':0.5,'fillOpacity':0.8}
+
+RA_json = folium.GeoJson(name='저수지 반경 ' + str(Range) + 'm' , data = P_exRange, style_function=lambda x:style2).add_to(testmap)
+
+R_json = folium.GeoJson(name = '저수지', data = P_exRES, style_function=lambda x:style1, popup=folium.GeoJsonPopup(fields = ['NAME_1'], 
+                                    aliases=['저수지명: '], style="font-size: 12pt;")).add_to(testmap)
+
+folium.GeoJson(name = '예상 침수 건물', data = gpd.GeoDataFrame(pd.concat(resultlist, ignore_index=True)), 
+               style_function=lambda x:style3, show=False).add_to(testmap)
+
+folium.LayerControl(collapsed=False).add_to(testmap)
+
+testmap.save(finpath + sidoCode + '/' + '0_' + baseJSON + 'MAP.html')
+
 print('end')
 endtime = time.time() - starttime
 print('time: ' + str(endtime) + 's')
